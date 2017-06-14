@@ -1,0 +1,3 @@
+let ENV = {
+  locationType: 'none'
+};

@@ -1,0 +1,2 @@
+moduleFor('controller:posts', {
+});

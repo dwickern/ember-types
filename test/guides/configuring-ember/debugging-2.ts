@@ -1,0 +1,1 @@
+ENV.APP.LOG_VIEW_LOOKUPS = true;
