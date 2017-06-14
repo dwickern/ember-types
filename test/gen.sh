@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-output=$(pwd)/guides
+output=$(pwd)/fixtures/ember-guides
 guides=~/code/ember-guides/source/localizable
 
 # separate multiple code blocks in a file

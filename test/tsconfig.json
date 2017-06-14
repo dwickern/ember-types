@@ -1,19 +1,11 @@
 {
   "compilerOptions": {
+    "module": "commonjs",
     "noImplicitThis": true,
-    //"noImplicitAny": true,
-    //"strictNullChecks": true,
-    "noEmit": true,
-    "typeRoots": [
-      "../src",
-      "src" // for tests
-    ],
-    "types" : [
-      "jquery",
-      "ember"
-    ]
+    "noImplicitAny": true,
+    "strictNullChecks": false
   },
-  "include": [
-    "**/*.ts"
+  "files": [
+    "test.ts"
   ]
 }

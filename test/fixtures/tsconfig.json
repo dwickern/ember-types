@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "noImplicitThis": true,
+//    "noImplicitAny": true,
+    //"strictNullChecks": true,
+    "noEmit": true,
+    "typeRoots": [
+      "../../src",
+      "src" // for tests
+    ],
+    "types" : [
+      "jquery",
+      "ember"
+    ]
+  },
+  "include": [
+    "**/*.ts"
+  ]
+}
