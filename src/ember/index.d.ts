@@ -43,6 +43,14 @@ declare namespace Ember {
     function getProperties<T, K extends keyof T>(obj: T, ...list: K[]): Pick<T, K>
     function set<T, K extends keyof T, V extends T[K]>(obj: T, key: K, value: V): V;
     function setProperties<T, K extends keyof T>(obj: T, hash: Pick<T, K>): Pick<T, K>;
+
+    interface EmberComputed {
+        <T, R>(f: (this: T) => R): R;
+        <T, R>(k1: keyof T, f: (this: T) => R): R;
+        <T, R>(k1: keyof T, k2: keyof T, f: (this: T) => R): R;
+        <T, R>(k1: keyof T, k2: keyof T, k3: keyof T, f: (this: T) => R): R;
+    }
+    const computed: EmberComputed;
 }
 
 declare module "ember" {
