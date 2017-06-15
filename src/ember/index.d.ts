@@ -20,7 +20,10 @@ declare namespace Ember {
 
     class Object extends CoreObject {
         get<K extends keyof this>(key: K): this[K];
-        set<T, K extends keyof T, V extends T[K]>(this: T, key: K, value: V): V;
+        getProperties<K extends keyof this>(list: K[]): Pick<this, K>
+        getProperties<K extends keyof this>(...list: K[]): Pick<this, K>
+        set<K extends keyof this>(key: K, value: this[K]): this[K];
+        setProperties<K extends keyof this>(hash: Pick<this, K>): Pick<this, K>;
     }
     class Component extends Object {
     }
@@ -36,7 +39,10 @@ declare namespace Ember {
 
     function A<T>(arr?: T[]): NativeArray<T>;
     function get<T, K extends keyof T>(obj: T, key: K): T[K]
+    function getProperties<T, K extends keyof T>(obj: T, list: K[]): Pick<T, K>
+    function getProperties<T, K extends keyof T>(obj: T, ...list: K[]): Pick<T, K>
     function set<T, K extends keyof T, V extends T[K]>(obj: T, key: K, value: V): V;
+    function setProperties<T, K extends keyof T>(obj: T, hash: Pick<T, K>): Pick<T, K>;
 }
 
 declare module "ember" {
