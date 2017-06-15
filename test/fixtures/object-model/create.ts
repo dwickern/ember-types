@@ -3,3 +3,4 @@ const counter = Ember.Object.create({
 });
 
 counter.count += 1;
+counter.nonexistent = 123; // EXPECT: TS2339

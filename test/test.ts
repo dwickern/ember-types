@@ -11,8 +11,10 @@ export function readCompilerOptions(rootDir: string) {
     return ts.parseConfigFileTextToJson(filename, jsonText).config.compilerOptions;
 }
 
-export function compile(sourceFile: string, compilerOptions: ts.CompilerOptions) {
-    const program = ts.createProgram([ sourceFile ], compilerOptions);
+export function compile(filename: string, compilerOptions: ts.CompilerOptions) {
+    const program = ts.createProgram([ filename ], compilerOptions);
+    const sourceFile = program.getSourceFile(filename);
+    const expected = new Map(expectedErrors(sourceFile));
 
     for (const diagnostic of ts.getPreEmitDiagnostics(program)) {
         if (diagnostic.category !== ts.DiagnosticCategory.Error) {
@@ -20,8 +22,34 @@ export function compile(sourceFile: string, compilerOptions: ts.CompilerOptions)
         }
 
         const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        if (expected.has(line)) {
+            const { text, code } = expected.get(line);
+            chai.assert(diagnostic.code === code,
+                `${diagnostic.file.fileName} (line ${line + 1}): Expected TS${code} but got TS${diagnostic.code}: ${text}`);
+            expected.delete(line);
+            continue;
+        }
         const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-        chai.assert(false, `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
+        chai.assert(false, `${diagnostic.file.fileName} (${line + 1},${character + 1}) TS${diagnostic.code}: ${message}`);
+    }
+
+    for (const [ line, { text, code } ] of expected) {
+        chai.assert(false, `${sourceFile.fileName} (line ${line + 1}): Expected code to NOT type-check: ${text}`);
+    }
+}
+
+function * expectedErrors(sourceFile: ts.SourceFile): Iterable<[ number, { text: string, code: number } ]> {
+    const lines = sourceFile.getLineStarts();
+    const ss = ts.ScriptSnapshot.fromString(sourceFile.text);
+
+    for (const [ line, start ] of lines.entries()) {
+        const end = sourceFile.getLineEndOfPosition(start);
+        const text = ss.getText(start, end);
+        const matches = text.match(/\/\/\s*EXPECT:?\s*TS(\d+)/);
+        if (matches) {
+            const code = Number(matches[1]);
+            yield [ line, { text, code } ];
+        }
     }
 }
 
