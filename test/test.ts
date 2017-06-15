@@ -28,8 +28,8 @@ export function compile(sourceFile: string, compilerOptions: ts.CompilerOptions)
 const fixtures = path.join(__dirname, 'fixtures');
 const compilerOptions = readCompilerOptions(fixtures);
 
-describe('Compile ember guides', function() {
-    const guides = glob.sync(path.join(fixtures, 'ember-guides/**/*.ts'), { nodir: true });
+describe('Compile tests', function() {
+    const guides = glob.sync(path.join(fixtures, '**/*.ts'), { nodir: true });
     guides.forEach(function (sourceFile) {
         it('should compile ' + path.relative(__dirname, sourceFile), function () {
             compile(sourceFile, compilerOptions);
