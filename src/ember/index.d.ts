@@ -1,22 +1,29 @@
 
 declare namespace Ember {
 
-    interface EmberClass<T> {
+    interface EmberClass<T, E = any> {
         new (...args: any[]): T;
         prototype: T;
 
-        extend<Statics, Instance extends CoreObject, Extensions>(
+        extend<Statics, Instance extends CoreObject, Extensions extends E>(
             this: EmberClass<Instance> & Statics,
             args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance>;
 
-        create<Instance extends Object, Extensions>(
+        create<Instance extends Object, Extensions extends E>(
             this: EmberClass<Instance>,
             args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
     }
 
+    interface CoreObjectArguments {
+        init?(): void;
+        willDestroy?(): void;
+
+        [key: string]: any;
+    }
+
     interface CoreObject {
     }
-    const CoreObject: EmberClass<CoreObject>;
+    const CoreObject: EmberClass<CoreObject, CoreObjectArguments>;
 
     class Object extends CoreObject {
         _super(...args: any[]): any;
@@ -27,8 +34,24 @@ declare namespace Ember {
         set<K extends keyof this>(key: K, value: this[K]): this[K];
         setProperties<K extends keyof this>(hash: Pick<this, K>): Pick<this, K>;
     }
-    class Component extends Object {
+
+    interface ComponentOptions extends CoreObjectArguments {
+        classNames?: string[];
+        classNameBindings?: string[];
+        didInsertElement?(): void;
+
+        actions?: {
+            [key: string]: Function;
+        };
     }
+
+    interface Component extends Object {
+        element: HTMLElement;
+        $: JQueryStatic;
+        isDestroyed: boolean;
+    }
+    const Component: EmberClass<Component, ComponentOptions>;
+
     class Service extends Object {
     }
 

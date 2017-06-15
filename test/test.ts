@@ -16,25 +16,37 @@ export function compile(filename: string, compilerOptions: ts.CompilerOptions) {
     const sourceFile = program.getSourceFile(filename);
     const expected = new Map(expectedErrors(sourceFile));
 
+    outer:
     for (const diagnostic of ts.getPreEmitDiagnostics(program)) {
         if (diagnostic.category !== ts.DiagnosticCategory.Error) {
             continue;
         }
 
-        const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-        if (expected.has(line)) {
-            const { text, code } = expected.get(line);
-            chai.assert(diagnostic.code === code,
-                `${diagnostic.file.fileName} (line ${line + 1}): Expected TS${code} but got TS${diagnostic.code}: ${text}`);
-            expected.delete(line);
-            continue;
+        const { line: startLine, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
+        const { line: endLine } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start + diagnostic.length);
+
+        for (const line of range(startLine, endLine)) {
+            if (expected.has(line)) {
+                const { text, code } = expected.get(line);
+                chai.assert(diagnostic.code === code,
+                    `${diagnostic.file.fileName} (line ${line + 1}): Expected TS${code} but got TS${diagnostic.code}: ${text}`);
+                expected.delete(line);
+                continue outer;
+            }
         }
+
         const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
-        chai.assert(false, `${diagnostic.file.fileName} (${line + 1},${character + 1}) TS${diagnostic.code}: ${message}`);
+        chai.assert(false, `${diagnostic.file.fileName} (${startLine + 1},${character + 1}) TS${diagnostic.code}: ${message}`);
     }
 
     for (const [ line, { text, code } ] of expected) {
         chai.assert(false, `${sourceFile.fileName} (line ${line + 1}): Expected code to NOT type-check: ${text}`);
+    }
+}
+
+function * range(from: number, to: number): Iterable<number> {
+    for (let i = from; i <= to; ++i) {
+        yield i;
     }
 }
 
