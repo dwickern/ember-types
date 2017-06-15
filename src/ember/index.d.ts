@@ -19,6 +19,8 @@ declare namespace Ember {
     const CoreObject: EmberClass<CoreObject>;
 
     class Object extends CoreObject {
+        _super(...args: any[]): any;
+
         get<K extends keyof this>(key: K): this[K];
         getProperties<K extends keyof this>(list: K[]): Pick<this, K>
         getProperties<K extends keyof this>(...list: K[]): Pick<this, K>
