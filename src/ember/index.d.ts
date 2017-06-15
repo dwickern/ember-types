@@ -19,6 +19,8 @@ declare namespace Ember {
     const CoreObject: EmberClass<CoreObject>;
 
     class Object extends CoreObject {
+        get<K extends keyof this>(key: K): this[K];
+        set<T, K extends keyof T, V extends T[K]>(this: T, key: K, value: V): V;
     }
     class Component extends Object {
     }
@@ -33,6 +35,8 @@ declare namespace Ember {
     }
 
     function A<T>(arr?: T[]): NativeArray<T>;
+    function get<T, K extends keyof T>(obj: T, key: K): T[K]
+    function set<T, K extends keyof T, V extends T[K]>(obj: T, key: K, value: V): V;
 }
 
 declare module "ember" {
