@@ -169,7 +169,7 @@ function addComment<T extends ts.Node>(node: T, description?: string): T {
 
 function param(param: YUI.Param): ts.ParameterDeclaration {
     const varargs = param.name.endsWith('*') ||
-        (param.type && param.type.startsWith('...')) ||
+        (param.type && (param.type.startsWith('...') || param.type.endsWith('...'))) ||
         param.multiple;
 
     return ts.createParameter(
@@ -194,12 +194,14 @@ function type(t?: YUI.TypeName, varargs: boolean = false): ts.TypeNode {
     if (!t) {
         return ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
     }
-    t = t.replace(/^\.{3}/, ''); // ...Object => Object
 
     const union = t.split(/\s*(?:\||\sor\s)\s*/); // string|number, string or number
     if (union.length > 1) {
         return ts.createUnionTypeNode(union.map(choice => type(choice)));
     }
+
+    t = t.replace(/^\.{3}/, ''); // ...Object => Object
+    t = t.replace(/\.{3}$/, ''); // Object... => Object
 
     switch (t) {
         case 'Object':
