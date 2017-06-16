@@ -4,7 +4,8 @@
   "main": "index.d.ts",
   "license": "MIT",
   "scripts": {
-    "test": "tsc -p test && mocha"
+    "test": "tsc -p test && mocha",
+    "gen-dts": "tsc -p declaration-generator && node declaration-generator/main.js"
   },
   "dependencies": {
     "@types/jquery": "^2.0.46",
