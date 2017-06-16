@@ -89,7 +89,7 @@ function method(c: YUI.ClassItem): ts.MethodDeclaration {
         /* decorators = */ undefined,
         /* modifiers = */ Array.from(modifiers(c.access)),
         /* asteriskToken = */ undefined,
-        /* name = */ c.name,
+        /* name = */ identifier(c.name),
         /* questionToken = */ undefined,
         /* typeParameters = */ undefined,
         /* parameters = */ (c.params || []).map(param),
@@ -104,13 +104,28 @@ function property(c: YUI.ClassItem): ts.PropertyDeclaration {
     let property = ts.createProperty(
         /* decorators = */ undefined,
         /* modifiers = */ Array.from(modifiers(c.access)),
-        /* name = */ c.name,
+        /* name = */ identifier(c.name),
         /* questionToken = */ undefined,
         /* type = */ type(c.type),
         /* initializer = */ undefined
     );
     property = addComment(property, c.description);
     return property;
+}
+
+
+function identifier(name: string) {
+    name = name.replace(/\*$/, '');
+
+    const ValidIdentifierRegex = /^[$A-Z_][0-9A-Z_$]*$/i;
+    const ReservedWords = <string[]>[
+
+    ];
+    if (!name.match(ValidIdentifierRegex) || ReservedWords.includes(name)) {
+        name = `"${name}"`;
+    }
+
+    return ts.createIdentifier(name);
 }
 
 function * modifiers(access?: YUI.Access): Iterable<ts.Modifier> {
@@ -139,13 +154,12 @@ function addComment<T extends ts.Node>(node: T, description?: string): T {
 
 function param(param: YUI.Param): ts.ParameterDeclaration {
     const varargs = param.name.endsWith('*') || param.multiple;
-    const name = param.name.replace(/\*$/, '');
 
     return ts.createParameter(
         /* decorators = */ undefined,
         /* modifiers = */ undefined,
         /* dotDotDotToken = */ varargs ? ts.createToken(ts.SyntaxKind.DotDotDotToken) : undefined,
-        /* name = */ name,
+        /* name = */ identifier(param.name),
         /* questionToken = */ undefined,
         /* type = */ type(param.type, varargs),
         /* initializer = */ undefined
