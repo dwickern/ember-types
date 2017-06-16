@@ -59,6 +59,7 @@ function classDeclaration(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassDeclara
 
     const members = items
         .filter(ci => ci.class === c.name)
+        .filter(ci => ci.access !== 'private')
         .sort((a, b) => a.line - b.line)
         .map(classMember);
 
