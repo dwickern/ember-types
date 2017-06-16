@@ -33,12 +33,12 @@ function generate(inputfile: string, outdir: string) {
 }
 
 function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
-    const statement = ts.createStatement(classExpr(clazz, items));
+    const classDecl = classDeclaration(clazz, items);
     const module = ts.createModuleDeclaration(
         /* decorators = */ undefined,
         /* modifiers = */ [ ts.createToken(ts.SyntaxKind.DeclareKeyword) ],
         /* name = */ ts.createLiteral("ember"),
-        /* body = */  ts.createModuleBlock([ statement ]),
+        /* body = */  ts.createModuleBlock([ classDecl ]),
         /* flags = */ undefined
     );
 
@@ -53,7 +53,7 @@ function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
     return sourceFile;
 }
 
-function classExpr(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassExpression {
+function classDeclaration(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassDeclaration {
     const className = c.name
         .replace(/^.*\./, ''); // remove prefix
 
@@ -62,7 +62,8 @@ function classExpr(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassExpression {
         .sort((a, b) => a.line - b.line)
         .map(classMember);
 
-    return ts.createClassExpression(
+    return ts.createClassDeclaration(
+        /* decorators = */ undefined,
         /* modifiers = */ [ ...modifiers(c.access) ],
         /* name = */ className,
         /* typeParameters = */ undefined,
