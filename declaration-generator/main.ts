@@ -130,7 +130,7 @@ function property(c: YUI.ClassItem): ts.PropertyDeclaration {
 
 
 function identifier(name: string) {
-    name = name.replace(/\*$/, '');
+    name = name.replace(/\*$/, ''); // args* => args
 
     const ValidIdentifierRegex = /^[$A-Z_][0-9A-Z_$]*$/i;
     const ReservedWords = <string[]>[
@@ -210,7 +210,6 @@ function type(t?: YUI.TypeName, varargs: boolean = false): ts.TypeNode {
         case 'JQuery':
         case 'DOMElement':
         default:
-            // TODO
-            return ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword);
+            return ts.createTypeReferenceNode(t, undefined);
     }
 }
