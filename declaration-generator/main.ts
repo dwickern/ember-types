@@ -34,7 +34,7 @@ function generate(inputfile: string, outdir: string) {
 
 function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
     const classDecl = classDeclaration(clazz, items);
-    const module = ts.createModuleDeclaration(
+    let module = ts.createModuleDeclaration(
         /* decorators = */ undefined,
         /* modifiers = */ [ ts.createToken(ts.SyntaxKind.DeclareKeyword) ],
         /* name = */ ts.createLiteral("ember"),
@@ -42,6 +42,14 @@ function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
         /* flags = */ undefined
     );
 
+    if (clazz.file) {
+        module = ts.addSyntheticLeadingComment(module,
+            /* kind = */ ts.SyntaxKind.SingleLineCommentTrivia,
+            /* text = */ clazz.file,
+            /* hasTrailingNewLine = */ true
+        );
+    }
+    
     let sourceFile = ts.createSourceFile(
         /* fileName = */ "",
         /* sourceText = */ "",
