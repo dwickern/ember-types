@@ -34,6 +34,14 @@ function generate(inputfile: string, outdir: string) {
 
 function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
     const statement = ts.createStatement(classExpr(clazz, items));
+    const module = ts.createModuleDeclaration(
+        /* decorators = */ undefined,
+        /* modifiers = */ [ ts.createToken(ts.SyntaxKind.DeclareKeyword) ],
+        /* name = */ ts.createLiteral("ember"),
+        /* body = */  ts.createModuleBlock([ statement ]),
+        /* flags = */ undefined
+    );
+
     let sourceFile = ts.createSourceFile(
         /* fileName = */ "",
         /* sourceText = */ "",
@@ -41,13 +49,13 @@ function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
         /* setParentNodes = */ false,
         /* scriptKind = */ ts.ScriptKind.TS
     );
-    sourceFile = ts.updateSourceFileNode(sourceFile, [ statement ]);
+    sourceFile = ts.updateSourceFileNode(sourceFile, [ module ]);
     return sourceFile;
 }
 
 function classExpr(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassExpression {
     const className = c.name
-        .replace(/^Ember\./, ''); // remove Ember prefix
+        .replace(/^.*\./, ''); // remove prefix
 
     const members = items
         .filter(ci => ci.class === c.name)
@@ -55,7 +63,7 @@ function classExpr(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassExpression {
         .map(classMember);
 
     return ts.createClassExpression(
-        /* modifiers = */ [ ts.createToken(ts.SyntaxKind.DeclareKeyword), ...modifiers(c.access) ],
+        /* modifiers = */ [ ...modifiers(c.access) ],
         /* name = */ className,
         /* typeParameters = */ undefined,
         /* heritageClauses = */ [],
