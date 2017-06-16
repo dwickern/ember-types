@@ -33,17 +33,18 @@ function generate(inputfile: string, outdir: string) {
 }
 
 function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
-    const classDecl = classDeclaration(clazz, items);
-    let module = ts.createModuleDeclaration(
+    let namespace = ts.createModuleDeclaration(
         /* decorators = */ undefined,
         /* modifiers = */ [ ts.createToken(ts.SyntaxKind.DeclareKeyword) ],
-        /* name = */ ts.createLiteral("ember"),
-        /* body = */  ts.createModuleBlock([ classDecl ]),
-        /* flags = */ undefined
+        /* name = */ ts.createIdentifier(clazz.namespace || "Ember"),
+        /* body = */  ts.createModuleBlock([
+            classDeclaration(clazz, items)
+        ]),
+        /* flags = */ ts.NodeFlags.Namespace
     );
 
     if (clazz.file) {
-        module = ts.addSyntheticLeadingComment(module,
+        namespace = ts.addSyntheticLeadingComment(namespace,
             /* kind = */ ts.SyntaxKind.SingleLineCommentTrivia,
             /* text = */ clazz.file,
             /* hasTrailingNewLine = */ true
@@ -57,7 +58,8 @@ function toSourceFile(clazz: YUI.Class, items: YUI.ClassItem[]): ts.SourceFile {
         /* setParentNodes = */ false,
         /* scriptKind = */ ts.ScriptKind.TS
     );
-    sourceFile = ts.updateSourceFileNode(sourceFile, [ module ]);
+
+    sourceFile = ts.updateSourceFileNode(sourceFile, [ namespace ]);
     return sourceFile;
 }
 
