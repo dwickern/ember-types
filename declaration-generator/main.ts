@@ -196,6 +196,11 @@ function type(t?: YUI.TypeName, varargs: boolean = false): ts.TypeNode {
     }
     t = t.replace(/^\.{3}/, ''); // ...Object => Object
 
+    const union = t.split(/\s*(?:\||\sor\s)\s*/); // string|number, string or number
+    if (union.length > 1) {
+        return ts.createUnionTypeNode(union.map(choice => type(choice)));
+    }
+
     switch (t) {
         case 'Object':
         case 'Any':
