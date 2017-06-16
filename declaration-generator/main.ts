@@ -71,7 +71,8 @@ function classDeclaration(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassDeclara
         .filter(ci => ci.class === c.name)
         .filter(ci => ci.access !== 'private')
         .sort((a, b) => a.line - b.line)
-        .map(classMember);
+        .map(classMember)
+        .filter((x): x is ts.ClassElement => x !== null);
 
     let decl = ts.createClassDeclaration(
         /* decorators = */ undefined,
@@ -86,7 +87,7 @@ function classDeclaration(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassDeclara
     return decl;
 }
 
-function classMember(c: YUI.ClassItem): ts.ClassElement {
+function classMember(c: YUI.ClassItem): ts.ClassElement | null {
     switch (c.itemtype) {
         case 'method':
         case 'event':
@@ -94,8 +95,8 @@ function classMember(c: YUI.ClassItem): ts.ClassElement {
         case 'property':
             return property(c);
         default:
-            // TODO
-            return ts.createSemicolonClassElement();
+            console.warn(`Skipping ${c.file}:${c.line}`);
+            return null;
     }
 }
 
