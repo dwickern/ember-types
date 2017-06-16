@@ -130,13 +130,16 @@ function addComment<T extends ts.Node>(node: T, description?: string): T {
 }
 
 function param(param: YUI.Param): ts.ParameterDeclaration {
+    const varargs = param.name.endsWith('*') || param.multiple;
+    const name = param.name.replace(/\*$/, '');
+
     return ts.createParameter(
         /* decorators = */ undefined,
         /* modifiers = */ undefined,
-        /* dotDotDotToken = */ undefined,
-        /* name = */ param.name,
+        /* dotDotDotToken = */ varargs ? ts.createToken(ts.SyntaxKind.DotDotDotToken) : undefined,
+        /* name = */ name,
         /* questionToken = */ undefined,
-        /* type = */ type(param.type),
+        /* type = */ type(param.type, varargs),
         /* initializer = */ undefined
     );
 }
@@ -145,8 +148,11 @@ function returnType(returnType?: YUI.ReturnType): ts.TypeNode {
     return type(returnType && returnType.type);
 }
 
-function type(type?: YUI.TypeName): ts.TypeNode {
-    switch (type) {
+function type(t?: YUI.TypeName, varargs: boolean = false): ts.TypeNode {
+    if (varargs) {
+        return ts.createArrayTypeNode(type(t));
+    }
+    switch (t) {
         case 'Object':
         case 'Any':
         case '*':
