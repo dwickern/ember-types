@@ -63,7 +63,7 @@ function classDeclaration(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassDeclara
         .sort((a, b) => a.line - b.line)
         .map(classMember);
 
-    return ts.createClassDeclaration(
+    let decl = ts.createClassDeclaration(
         /* decorators = */ undefined,
         /* modifiers = */ [ ...modifiers(c.access) ],
         /* name = */ className,
@@ -71,6 +71,9 @@ function classDeclaration(c: YUI.Class, items: YUI.ClassItem[]): ts.ClassDeclara
         /* heritageClauses = */ [],
         /* members = */ members
     );
+
+    decl = addComment(decl, c.description);
+    return decl;
 }
 
 function classMember(c: YUI.ClassItem): ts.ClassElement {
