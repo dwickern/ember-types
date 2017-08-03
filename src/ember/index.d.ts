@@ -1,27 +1,25 @@
 
 declare namespace Ember {
 
-    interface EmberClass<T, E = any> {
+    interface EmberClass<T, E> {
         new (...args: any[]): T;
         prototype: T;
 
-        extend<Statics, Instance extends CoreObject, Extensions extends E>(
-            this: EmberClass<Instance> & Statics,
-            args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance>;
+        extend<Statics, Instance extends CoreObject, Extensions extends Partial<E>>(
+            this: EmberClass<Instance, E> & Statics,
+            args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance, {}>;
 
-        create<Instance extends Object, Extensions extends E>(
-            this: EmberClass<Instance>,
+        create<Instance extends Object, Extensions extends Partial<E>>(
+            this: EmberClass<Instance, E>,
             args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
     }
 
     interface CoreObjectArguments {
-        init?(): void;
-        willDestroy?(): void;
-
-        [key: string]: any;
+        init(): void;
+        willDestroy(): void;
     }
 
-    interface CoreObject {
+    interface CoreObject extends CoreObjectArguments {
     }
     const CoreObject: EmberClass<CoreObject, CoreObjectArguments>;
 
@@ -35,22 +33,26 @@ declare namespace Ember {
         setProperties<K extends keyof this>(hash: Pick<this, K>): Pick<this, K>;
     }
 
-    interface ComponentOptions extends CoreObjectArguments {
-        classNames?: string[];
-        classNameBindings?: string[];
-        didInsertElement?(): void;
+    interface ComponentArguments extends CoreObjectArguments {
+        classNames: string[] | string;
+        classNameBindings: string[] | string;
+        didInsertElement(): void;
+        didReceiveAttrs(): void;
+        didUpdateAttrs(): void;
+        willDestroyElement(): void;
 
-        actions?: {
+        actions: {
             [key: string]: Function;
         };
     }
 
-    interface Component extends Object {
+    interface Component extends Object, ComponentArguments {
         element: HTMLElement;
         $: JQueryStatic;
         isDestroyed: boolean;
     }
-    const Component: EmberClass<Component, ComponentOptions>;
+    // class Component extends Object implements ComponentOptions {}
+    const Component: EmberClass<Component, ComponentArguments>;
 
     class Service extends Object {
     }
