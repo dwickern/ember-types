@@ -1,29 +1,26 @@
 
 declare namespace Ember {
 
-    interface EmberClass<T, E> {
+    interface EmberClass<T> {
         new (...args: any[]): T;
         prototype: T;
 
-        extend<Statics, Instance extends CoreObject, Extensions extends Partial<E>>(
-            this: EmberClass<Instance, E> & Statics,
-            args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance, {}>;
+        extend<Statics, Instance extends CoreObject, Extensions extends Partial<T>>(
+            this: EmberClass<Instance> & Statics,
+            args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance>;
 
-        create<Instance extends Object, Extensions extends Partial<E>>(
-            this: EmberClass<Instance, E>,
+        create<Instance extends Object, Extensions extends Partial<T>>(
+            this: EmberClass<Instance>,
             args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
     }
 
-    interface CoreObjectArguments {
+    interface CoreObject {
         init(): void;
         willDestroy(): void;
     }
+    const CoreObject: EmberClass<CoreObject>;
 
-    interface CoreObject extends CoreObjectArguments {
-    }
-    const CoreObject: EmberClass<CoreObject, CoreObjectArguments>;
-
-    class Object extends CoreObject {
+    interface Object extends CoreObject {
         _super(...args: any[]): any;
 
         get<K extends keyof this>(key: K): this[K];
@@ -32,8 +29,12 @@ declare namespace Ember {
         set<K extends keyof this>(key: K, value: this[K]): this[K];
         setProperties<K extends keyof this>(hash: Pick<this, K>): Pick<this, K>;
     }
+    const Object: EmberClass<Object>;
 
-    interface ComponentArguments extends CoreObjectArguments {
+    interface Component extends Object {
+        element: HTMLElement;
+        $: JQueryStatic;
+        isDestroyed: boolean;
         classNames: string[] | string;
         classNameBindings: string[] | string;
         didInsertElement(): void;
@@ -45,14 +46,7 @@ declare namespace Ember {
             [key: string]: Function;
         };
     }
-
-    interface Component extends Object, ComponentArguments {
-        element: HTMLElement;
-        $: JQueryStatic;
-        isDestroyed: boolean;
-    }
-    // class Component extends Object implements ComponentOptions {}
-    const Component: EmberClass<Component, ComponentArguments>;
+    const Component: EmberClass<Component>;
 
     class Service extends Object {
     }
