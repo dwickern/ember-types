@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
+    "target": "es5",
     "noImplicitThis": true,
 //    "noImplicitAny": true,
     //"strictNullChecks": true,
+    "experimentalDecorators": true,
     "noEmit": true,
     "typeRoots": [
       "../../src",
