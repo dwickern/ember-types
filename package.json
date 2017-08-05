@@ -20,6 +20,6 @@
     "codedown": "dwickern/codedown",
     "glob": "^7.1.2",
     "mocha": "^3.4.2",
-    "typescript": "^2.3.4"
+    "typescript": "^2.4.2"
   }
 }
