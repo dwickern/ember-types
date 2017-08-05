@@ -3,18 +3,22 @@ type EmberClassArguments<T> = Partial<T> & {
     [key: string]: any
 }
 
-interface EmberClass<T> {
+interface EmberClassConstructor<T> {
     new (...args: any[]): T;
     prototype: T;
-    detect(obj: any): obj is T;
 
+    create<Instance, Extensions extends EmberClassArguments<T>>(
+        this: EmberClassConstructor<Instance>,
+        args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
+}
+
+interface EmberClass<T> extends EmberClassConstructor<T> {
     extend<Statics, Instance, Extensions extends EmberClassArguments<T>>(
         this: EmberClass<Instance> & Statics,
         args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance>;
 
-    create<Instance, Extensions extends EmberClassArguments<T>>(
-        this: EmberClass<Instance>,
-        args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
+    detect(obj: any): obj is EmberClass<T>;
+    detectInstance(obj: any): obj is T;
 }
 
 declare namespace Ember {

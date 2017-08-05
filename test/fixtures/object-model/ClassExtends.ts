@@ -21,6 +21,7 @@ class Foo extends Ember.Object {
 let foo = Foo.create();
 assertType<string>(foo.get('first'));
 assertType<string>(foo.get('name'));
+assertType<string>(foo.get('dummy')); // EXPECT: TS2345
 
 class MyComponent extends Ember.Component {
     firstName: '';
@@ -28,7 +29,11 @@ class MyComponent extends Ember.Component {
 
     @computed('firstName', 'lastName')
     get fullName() {
-        return `${this.get('firstName')} ${this.get('lastNmae')}`;
+        return `${this.get('firstName')} ${this.get('lastName')}`;
+    }
+
+    get fullNameTypo() {
+        return `${this.get('firstName')} ${this.get('lastNmae')}`; // EXPECT: TS2345
     }
 
     didInsertElement(): void {
