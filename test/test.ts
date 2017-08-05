@@ -69,7 +69,7 @@ const fixtures = path.join(__dirname, 'fixtures');
 const compilerOptions = readCompilerOptions(fixtures);
 
 describe('Compile tests', function() {
-    const guides = glob.sync(path.join(fixtures, '**/*.ts'), { nodir: true });
+    const guides = glob.sync(path.join(fixtures, 'object-model/**/*.ts'), { nodir: true });
     guides.forEach(function (sourceFile) {
         it('should compile ' + path.relative(__dirname, sourceFile), function () {
             compile(sourceFile, compilerOptions);
