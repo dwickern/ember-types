@@ -6,6 +6,7 @@ type EmberClassArguments<T> = Partial<T> & {
 interface EmberClass<T> {
     new (...args: any[]): T;
     prototype: T;
+    detect(obj: any): obj is T;
 
     extend<Statics, Instance, Extensions extends EmberClassArguments<T>>(
         this: EmberClass<Instance> & Statics,
