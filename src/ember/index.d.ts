@@ -1,22 +1,22 @@
 
+type EmberClassArguments<T> = Partial<T> & {
+    [key: string]: any
+}
+
+interface EmberClass<T> {
+    new (...args: any[]): T;
+    prototype: T;
+
+    extend<Statics, Instance, Extensions extends EmberClassArguments<T>>(
+        this: EmberClass<Instance> & Statics,
+        args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance>;
+
+    create<Instance, Extensions extends EmberClassArguments<T>>(
+        this: EmberClass<Instance>,
+        args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
+}
+
 declare namespace Ember {
-
-    type EmberClassArguments<T> = Partial<T> & {
-        [key: string]: any
-    }
-
-    interface EmberClass<T> {
-        new (...args: any[]): T;
-        prototype: T;
-
-        extend<Statics, Instance extends CoreObject, Extensions extends EmberClassArguments<T>>(
-            this: EmberClass<Instance> & Statics,
-            args?: Extensions & ThisType<Extensions & Instance>): EmberClass<Extensions & Instance>;
-
-        create<Instance extends Object, Extensions extends EmberClassArguments<T>>(
-            this: EmberClass<Instance>,
-            args?: Extensions & ThisType<Extensions & Instance>): Extensions & Instance;
-    }
 
     interface CoreObject {
         init(): void;
